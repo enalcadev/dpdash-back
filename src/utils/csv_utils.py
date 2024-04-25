@@ -11,9 +11,4 @@ def customize_date_column_format(data, column, initial_format, end_format):
 
 
 def get_total_sum_by_id(data, id_column, to_sum_column):
-    return data.groupby(id_column).sum()[to_sum_column]
-
-
-def read_csv_rows(file_rows):
-    for row in file_rows:
-        print('\n'.join(row))
+    return data.groupby(id_column).sum()[to_sum_column].reset_index()
