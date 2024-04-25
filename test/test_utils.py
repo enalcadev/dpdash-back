@@ -21,6 +21,12 @@ class TestUtils(unittest.TestCase):
         csv_utils.customize_date_column_format(data, "Start Time", "%d/%m/%Y %H:%M %p", "%d/%m/%Y")
         self.assertEqual(data["Start Time"][197], '06/03/2024')
 
+    def test_total_sum_by_id(self):
+        data = pd.read_csv(get_full_file(path='files/worklog-details-report202404250906.csv'))
+        self.assertTrue((data.columns == ["Assignee", "Worklog Description", "User", "Start Time", "Time Spent"]).all)
+        self.assertEqual(csv_utils.get_total_sum_by_id(data, "Assignee", "Time Spent (s)")["Enrique Albert Caballero"],
+                         50400)
+
 
 if __name__ == '__main__':
     unittest.main()
