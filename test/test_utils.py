@@ -30,7 +30,7 @@ class TestUtils(unittest.TestCase):
 
     def test_identify_low_frequency_results(self):
         data = pd.read_csv(get_full_file(path='files/worklog-details-report202404250906.csv'))
-        self.assertTrue((csv_utils.identify_low_frequency_results(data, "Worklog Description", 1) ==
+        self.assertTrue((csv_utils.identify_results_by_frequency(data, "Worklog Description", 1).unknown ==
                          ['Geoc actualizado', 'SGE listo', 'GOVER funcionando',
                           'Hores empleadas en la configuració de les VPN y GEOC',
                           'Configurar proyecto GOVR', 'GOVER', 'SAI', 'RITC',
@@ -46,6 +46,43 @@ class TestUtils(unittest.TestCase):
                           'Problemas con la Migració de ICT',
                           'Una serie de problemas con la migracion en RITC solucionados',
                           'Migracion de RITC', 'GEOC - Working']).all())
+
+    def test_replace_unwanted_results(self):
+        replacements_dictionary = {
+            'Configurar proyecto GOVR': 'GOVR',
+            'Migracion de GOVR': 'GOVR',
+            'GOVER funcionando': 'GOVR',
+            'ICT / GOVR': 'GOVR',
+            'SGE/GOVER': 'GOVR',
+            'GOVER': 'GOVR',
+            'Geoc': 'GEOC',
+            'GEOC - Working': 'GEOC',
+            'Geoc actualizado': 'GEOC',
+            'Configuración de GEOC': 'GEOC',
+            'Horas empleadas en GEOC': 'GEOC',
+            'Hores empleadas en GEOC': 'GEOC',
+            'Ayudando a Geoffrey a configurar GEOC': 'GEOC',
+            'GOVR. Muchos problemas con base de datos': 'GEOC',
+            'Hores empleadas en la configuració de les VPN y GEOC': 'GEOC',
+            'He estado mirando que todos los proyectos funcionaran, y me puse también a instalar GEOC': 'GEOC',
+            'ICT': 'ICT/RITC',
+            'RITC': 'ICT/RITC',
+            'Migració de ICT': 'ICT/RITC',
+            'Migracion de RITC': 'ICT/RITC',
+            'Se realizo la Miració de ICT': 'ICT/RITC',
+            'Problemas con la Migració de ICT': 'ICT/RITC',
+            'Una serie de problemas con la migracion en RITC solucionados': 'ICT/RITC',
+            'Ayuda sge, se ha conseguido acabar de instalar': 'SGE',
+            'Soporte a Jonathan con configuración SGE+': 'SGE',
+            'Configuración de SGE': 'SGE',
+            'GOVR + SGE': 'SGE',
+            'SGE listo': 'SGE',
+            'SGE+': 'SGE',
+        }
+        data = pd.read_csv(get_full_file(path='files/worklog-details-report202404250906.csv'))
+        csv_utils.replace_unknown_values(data, "Worklog Description", replacements_dictionary)
+        self.assertTrue((csv_utils.identify_results_by_frequency(data, "Worklog Description", 1).valid == ['SGE', 'GEOC',
+                         'RACC', 'GOVR', 'ICT/RITC']).all())
 
 
 if __name__ == '__main__':
